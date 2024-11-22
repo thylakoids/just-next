@@ -1,62 +1,80 @@
 'use client'
 
-import React, { createContext, useContext, useReducer } from 'react';
-
-type AuthState = {
-  isAuthenticated: boolean;
-  user: string | null;
-  role: string | null;
-  token: string | null;
-};
-
-type AuthAction = 
-  | { type: 'LOGIN_SUCCESS'; payload: { name: string; role: string; token: string } }
-  | { type: 'LOGOUT' }
-  | { type: 'AUTH_ERROR' };
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+import { AuthState, AuthAction } from '../types/auth'
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
-  role: null,
-  token: null,
-};
-
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case 'LOGIN_SUCCESS':
-      return {
-        isAuthenticated: true,
-        user: action.payload.name,
-        role: action.payload.role,
-        token: action.payload.token,
-      };
-    case 'LOGOUT':
-    case 'AUTH_ERROR':
-      return initialState;
-    default:
-      return state;
-  }
-};
+  loading: false
+}
 
 const AuthContext = createContext<{
   state: AuthState;
   dispatch: React.Dispatch<AuthAction>;
-} | undefined>(undefined);
+}>({
+  state: initialState,
+  dispatch: () => null
+})
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        isAuthenticated: true,
+        user: { ...state.user, ...action.payload },
+        loading: false
+      }
+    case 'LOGOUT':
+      localStorage.removeItem('accessToken') // Clear token on logout
+      localStorage.removeItem('refreshToken') // Clear refresh token on logout
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        loading: false
+      }
+    case 'SET_LOADING':
+      return {
+        ...state,
+        loading: true
+      }
+    default:
+      return state
+  }
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [state, dispatch] = useReducer(authReducer, initialState)
+
+  // Check for token on initial load
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken')
+    if (accessToken) {
+      dispatch({ 
+        type: 'LOGIN_SUCCESS', 
+        payload: { 
+          accessToken,
+          name: '', // Add required User properties
+          role: '',
+          refreshToken: ''
+        } 
+      })
+    }
+  }, [])
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>
       {children}
     </AuthContext.Provider>
-  );
+  )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
   }
-  return context;
-} 
+  return context
+}

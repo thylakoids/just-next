@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth } from '../context/authContext'
+import { useAuth } from '@/app/context/authContext'
 import Banner from './Banner'
 
 export default function LayoutContent({

@@ -1,109 +1,107 @@
 'use client'
 
-import { useState } from 'react'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { useAuth } from '@/app/context/authContext'
+import { useEffect, useState } from 'react'
+import { useAuth } from '../context/authContext'
+import { fetchAllUsers } from '../utils/api'
+import BannerSkeleton from '../components/BannerSkeleton'
 
-export default function LoginPage() {
-  const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
-  const { dispatch } = useAuth()
+interface User {
+  name: string;
+  role: string;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+export default function DashboardPage() {
+  const { state } = useAuth()
+  const [users, setUsers] = useState<User[]>([])
+  const [loading, setLoading] = useState(false)
 
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, password }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Login failed')
+  useEffect(() => {
+    async function getUsers() {
+      if (state.user?.role === 'manager' && state.user?.accessToken) {
+        try {
+          setLoading(true)
+          const data = await fetchAllUsers(state.user.accessToken)
+          setUsers(data)
+        } catch (error) {
+          console.error('Failed to fetch users:', error)
+        } finally {
+          setLoading(false)
+        }
       }
-
-      dispatch({ type: 'LOGIN_SUCCESS', payload: name })
-      router.push('/dashboard')
-    } catch (err) {
-      setError('Invalid name or password')
     }
+
+    getUsers()
+  }, [state.user?.role, state.user?.accessToken])
+
+  // Show loading skeleton while checking auth or fetching users
+  if (!state.isAuthenticated || state.loading || !state.user?.name) {
+    return (
+      <>
+        <BannerSkeleton />
+        {/* Content Skeleton */}
+        <div className="min-h-screen bg-gray-50">
+          <div className="p-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="h-8 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-12 bg-gray-100 rounded animate-pulse"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  if (!state.isAuthenticated) {
+    return null
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-lg">
-        <div className="text-center">
-          <Image
-            className="mx-auto h-12 w-auto"
-            src="/next.svg"
-            alt="Logo"
-            width={48}
-            height={48}
-          />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
-          
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="name" className="sr-only">
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10"
-                placeholder="Name"
-              />
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              User Management
+            </h2>
             
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10"
-                placeholder="Password"
-              />
-            </div>
+            {loading ? (
+              <div className="animate-pulse space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-12 bg-gray-100 rounded"></div>
+                ))}
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-200">
+                {users.map((user) => (
+                  <div 
+                    key={user.name}
+                    className="py-3 flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-800">{user.name}</p>
+                      <p className="text-sm text-gray-500">{user.role}</p>
+                    </div>
+                    <span 
+                      className={`px-2 py-1 rounded-full text-sm ${
+                        user.role === 'manager' 
+                          ? 'bg-purple-100 text-purple-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}
+                    >
+                      {user.role}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sign in
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   )
