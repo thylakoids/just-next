@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useAuth } from '../context/authContext'
 import { fetchUserData, logoutUser } from '../utils/api'
 
 export default function Banner() {
   const router = useRouter()
+  const pathname = usePathname()
   const { state, dispatch } = useAuth()
   const dataFetched = useRef(false)
 
@@ -30,7 +31,7 @@ export default function Banner() {
     }
 
     getUserData()
-  }, []) // only run on mount
+  }, [state.isAuthenticated, state.user?.accessToken, dispatch, router])
 
   const handleLogout = async () => {
     try {
@@ -46,22 +47,37 @@ export default function Banner() {
     }
   }
 
+  if (pathname === '/login') {
+    return null
+  }
+
   if (state.loading || !state.user?.name) {
     return null;
   }
 
+  const isManager = state.user.role === 'manager'
+
   return (
-    <div className="bg-blue-600 text-white p-4">
+    <div className={`${isManager ? 'bg-purple-600' : 'bg-blue-600'} text-white p-4`}>
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
-          <span>Welcome, {state.user.name}!</span>
-          <span className="px-2 py-1 bg-blue-700 rounded-full text-sm">
+          <div 
+            className={`w-10 h-10 rounded-full ${isManager ? 'bg-purple-700' : 'bg-blue-700'} flex items-center justify-center font-semibold cursor-pointer transition-transform hover:scale-110`}
+            title={state.user.name}
+          >
+            {state.user.name.charAt(0).toUpperCase()}
+          </div>
+          <span className={`px-2 py-1 rounded-full text-sm ${isManager ? 'bg-purple-700' : 'bg-blue-700'}`}>
             {state.user.role}
           </span>
         </div>
         <button
           onClick={handleLogout}
-          className="px-4 py-2 bg-blue-700 rounded-lg hover:bg-blue-800 transition-colors"
+          className={`px-4 py-2 rounded-lg transition-colors ${
+            isManager 
+              ? 'bg-purple-700 hover:bg-purple-800' 
+              : 'bg-blue-700 hover:bg-blue-800'
+          }`}
         >
           Logout
         </button>

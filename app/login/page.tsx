@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../context/authContext'
 import type { User } from '../types/auth'
-import local from 'next/font/local'
 
 export default function LoginPage() {
   const [name, setName] = useState('')

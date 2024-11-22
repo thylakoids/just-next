@@ -1,12 +1,13 @@
 'use client'
 
 import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { AuthState, AuthAction } from '../types/auth'
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
-  loading: false
+  loading: true
 }
 
 const AuthContext = createContext<{
@@ -27,8 +28,10 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         loading: false
       }
     case 'LOGOUT':
-      localStorage.removeItem('accessToken') // Clear token on logout
-      localStorage.removeItem('refreshToken') // Clear refresh token on logout
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+      }
       return {
         ...state,
         isAuthenticated: false,
@@ -40,6 +43,11 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         ...state,
         loading: true
       }
+    case 'INIT_AUTH':
+      return {
+        ...state,
+        loading: false
+      }
     default:
       return state
   }
@@ -47,21 +55,28 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(authReducer, initialState)
+  const router = useRouter()
 
-  // Check for token on initial load
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken')
-    if (accessToken) {
-      dispatch({ 
-        type: 'LOGIN_SUCCESS', 
-        payload: { 
-          accessToken,
-          name: '', // Add required User properties
-          role: '',
-          refreshToken: ''
-        } 
-      })
+    const initAuth = () => {
+      const accessToken = localStorage.getItem('accessToken')
+      if (accessToken) {
+        dispatch({ 
+          type: 'LOGIN_SUCCESS', 
+          payload: { 
+            accessToken,
+            name: '',
+            role: '',
+            refreshToken: localStorage.getItem('refreshToken') || ''
+          } 
+        })
+      } else {
+        dispatch({ type: 'INIT_AUTH' })
+        router.push('/login')
+      }
     }
+
+    initAuth()
   }, [])
 
   return (

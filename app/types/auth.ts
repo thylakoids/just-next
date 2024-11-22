@@ -14,4 +14,5 @@ export interface AuthState {
 export type AuthAction = 
   | { type: 'LOGIN_SUCCESS'; payload: User }
   | { type: 'LOGOUT' }
-  | { type: 'SET_LOADING' } 
+  | { type: 'SET_LOADING' }
+  | { type: 'INIT_AUTH' }
