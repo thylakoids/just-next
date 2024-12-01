@@ -1,11 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  basePath: '/home',
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:1314/:path*',
+        destination: 'https://tpyrcne.buzz/api/:path*',
       },
     ];
   }
