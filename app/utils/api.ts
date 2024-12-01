@@ -97,3 +97,55 @@ export async function loginUser(name: string, password: string): Promise<User> {
 
   return response.json()
 } 
+
+interface Todo {
+  id: number;
+  username: string;
+  title: string;
+  completed: boolean;
+}
+
+export const fetchTodos = async (token: string): Promise<Todo[]> => {
+  const response = await fetch('/api/todos', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!response.ok) throw new Error('Failed to fetch todos')
+  return response.json()
+}
+
+export const addTodo = async (token: string, data: { text: string }): Promise<Todo> => {
+  const response = await fetch('/api/todos', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ title: data.text })
+  })
+  if (!response.ok) throw new Error('Failed to add todo')
+  return response.json()
+}
+
+export const toggleTodo = async (token: string, todoId: string, completed: boolean): Promise<void> => {
+  const response = await fetch(`/api/todos/${todoId}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ completed })
+  })
+  if (!response.ok) throw new Error('Failed to toggle todo')
+}
+
+export const deleteTodo = async (token: string, todoId: string): Promise<void> => {
+  const response = await fetch(`/api/todos/${todoId}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!response.ok) throw new Error('Failed to delete todo')
+} 

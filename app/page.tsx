@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from './context/authContext'
 import { fetchAllUsers, addMember, delMember } from './utils/api'
 import BannerSkeleton from './components/BannerSkeleton'
+import TodoPanel from './components/TodoPanel'
 
 interface User {
   name: string;
@@ -102,12 +103,12 @@ export default function DashboardPage() {
 
   if (!state.isAuthenticated) return null
 
-  // If not a manager, show a welcome message with matching color scheme
+  // If not a manager, show welcome message and todo section
   if (state.user.role !== 'manager') {
     return (
       <div className="min-h-screen bg-blue-50">
         <div className="p-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto space-y-6">
             <div className="bg-white rounded-lg shadow-lg p-6">
               <div className="relative">
                 <div className="absolute -left-2 -top-2 w-12 h-12 bg-blue-100 rounded-lg transform -rotate-6"></div>
@@ -121,17 +122,24 @@ export default function DashboardPage() {
                 </div>
               </div>
             </div>
+
+            {/* Todo Section */}
+            <TodoPanel />
           </div>
         </div>
       </div>
     )
   }
 
-  // Manager view with user management panel
+  // Manager view with user management panel and todo section
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Todo Section for Manager */}
+          <TodoPanel />
+
+          {/* User Management Section */}
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex justify-between items-center mb-6">
               <div className="relative">

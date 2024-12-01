@@ -63,6 +63,7 @@ export default function Banner() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div 
+            onClick={() => router.push('/')}
             className={`w-10 h-10 rounded-full ${isManager ? 'bg-purple-700' : 'bg-blue-700'} flex items-center justify-center font-semibold cursor-pointer transition-transform hover:scale-110`}
             title={state.user.name}
           >
