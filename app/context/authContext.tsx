@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     initAuth()
-  }, [])
+  }, [router])
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>

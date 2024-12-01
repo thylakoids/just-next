@@ -24,6 +24,7 @@ export default function Banner() {
           payload: userData 
         })
       } catch (error) {
+        // token expired
         console.error('Failed to fetch user data:', error)
         dispatch({ type: 'LOGOUT' })
         router.push('/login')

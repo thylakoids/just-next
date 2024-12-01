@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../context/authContext'
-import type { User } from '../types/auth'
+import { loginUser } from '../utils/api'
 
 export default function LoginPage() {
   const [name, setName] = useState('')
@@ -19,19 +19,7 @@ export default function LoginPage() {
     dispatch({ type: 'SET_LOADING' })
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, password }),
-      })
-
-      if (!response.ok) {
-        throw new Error('Login failed')
-      }
-
-      const data: User = await response.json()
+      const data = await loginUser(name, password)
       localStorage.setItem('accessToken', data.accessToken)
       localStorage.setItem('refreshToken', data.refreshToken)
       dispatch({ 
@@ -39,9 +27,10 @@ export default function LoginPage() {
         payload: data, 
       })
       
-      router.push('/dashboard')
-    } catch (err) {
-      setError('Invalid name or password')
+      router.push('/')
+
+    } catch (error) {
+      setError('Invalid name or password: ' + error)
     }
   }
 

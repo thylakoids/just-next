@@ -1,5 +1,7 @@
+import type { User } from '../types/auth'
+
 export async function fetchUserData(token: string) {
-  const response = await fetch('/api/user', {
+  const response = await fetch('/api/auth/user', {
     headers: {
       'authorization': `Bearer ${token}`,
     },
@@ -13,7 +15,7 @@ export async function fetchUserData(token: string) {
 }
 
 export async function logoutUser(refreshToken: string) {
-  const response = await fetch('/api/logout', {
+  const response = await fetch('/api/auth/logout', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -28,7 +30,7 @@ export async function logoutUser(refreshToken: string) {
 }
 
 export async function fetchAllUsers(token: string) {
-  const response = await fetch('/api/users', {
+  const response = await fetch('/api/auth/users', {
     headers: {
       'Authorization': `Bearer ${token}`,
     },
@@ -47,7 +49,7 @@ interface AddMemberData {
 }
 
 export async function addMember(token: string, data: AddMemberData) {
-  const response = await fetch('/api/addmember', {
+  const response = await fetch('/api/auth/addmember', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -66,7 +68,7 @@ interface delMemberData {
 }
 
 export async function delMember(token: string, data: delMemberData) {
-  const response = await fetch('/api/delmember', {
+  const response = await fetch('/api/auth/delmember', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -78,4 +80,20 @@ export async function delMember(token: string, data: delMemberData) {
   if (!response.ok) {
     throw new Error('Failed to delete member');
   }
+} 
+
+export async function loginUser(name: string, password: string): Promise<User> {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, password }),
+  })
+
+  if (!response.ok) {
+    throw new Error('Login failed')
+  }
+
+  return response.json()
 } 
