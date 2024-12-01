@@ -3,7 +3,7 @@ import type { User } from '../types/auth'
 export async function fetchUserData(token: string) {
   const response = await fetch('/api/auth/user', {
     headers: {
-      'authorization': `Bearer ${token}`,
+      'authtp': `Bearer ${token}`,
     },
   });
 
@@ -32,7 +32,7 @@ export async function logoutUser(refreshToken: string) {
 export async function fetchAllUsers(token: string) {
   const response = await fetch('/api/auth/users', {
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'authtp': `Bearer ${token}`,
     },
   });
 
@@ -53,7 +53,7 @@ export async function addMember(token: string, data: AddMemberData) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'authtp': `Bearer ${token}`
     },
     body: JSON.stringify(data)
   });
@@ -72,7 +72,7 @@ export async function delMember(token: string, data: delMemberData) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'authtp': `Bearer ${token}`
     },
     body: JSON.stringify(data)
   });
@@ -108,7 +108,7 @@ interface Todo {
 export const fetchTodos = async (token: string): Promise<Todo[]> => {
   const response = await fetch('/api/todos', {
     headers: {
-      'Authorization': `Bearer ${token}`
+      'authtp': `Bearer ${token}`
     }
   })
   if (!response.ok) throw new Error('Failed to fetch todos')
@@ -119,7 +119,7 @@ export const addTodo = async (token: string, data: { text: string }): Promise<To
   const response = await fetch('/api/todos', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'authtp': `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ title: data.text })
@@ -132,7 +132,7 @@ export const toggleTodo = async (token: string, todoId: string, completed: boole
   const response = await fetch(`/api/todos/${todoId}`, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'authtp': `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ completed })
@@ -144,7 +144,7 @@ export const deleteTodo = async (token: string, todoId: string): Promise<void> =
   const response = await fetch(`/api/todos/${todoId}`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${token}`
+      'authtp': `Bearer ${token}`
     }
   })
   if (!response.ok) throw new Error('Failed to delete todo')
