@@ -40,7 +40,7 @@ export default function LoginPage() {
         <div className="text-center">
           <Image
             className="mx-auto h-12 w-auto"
-            src="/home/globe.svg"
+            src="/home/icon.svg"
             alt="Logo"
             width={48}
             height={48}
