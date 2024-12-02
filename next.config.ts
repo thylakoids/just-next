@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  basePath: '/home',
+  // basePath: '/home',
   async rewrites() {
     return [
       {
