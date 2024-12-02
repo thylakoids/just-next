@@ -9,6 +9,10 @@ interface TodoItemProps {
 }
 
 export default function TodoItem({ id, title, completed, onToggle, onDelete }: TodoItemProps) {
+  const handleCopy = () => {
+    navigator.clipboard.writeText(title);
+  };
+
   return (
     <li className="flex gap-1 items-center group min-w-50">
       <input
@@ -21,11 +25,19 @@ export default function TodoItem({ id, title, completed, onToggle, onDelete }: T
       <label
         htmlFor={id.toString()}
         className="cursor-pointer text-gray-900 peer-checked:line-through
-        peer-checked:text-slate-300 flex-grow truncate
-        "
+        peer-checked:text-slate-300 flex-grow"
       >
         {title}
       </label>
+      <button
+        onClick={handleCopy}
+        className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-blue-500 transition-all"
+        aria-label="Copy todo text"
+      >
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+        </svg>
+      </button>
       <button
         onClick={() => onDelete(id.toString())}
         className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all"
