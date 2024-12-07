@@ -49,14 +49,14 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="text-red-500 text-sm text-center">
               {error}
             </div>
           )}
-          
+
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="name" className="sr-only">
