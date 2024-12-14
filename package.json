@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "deploy": "rsync -avzhP --delete  ~/nextjs/my-auth-todo-app/ vultr_sv:my-auth-todo-app/",
+    "deploy": "rsync -avzhP --delete --exclude-from='.rsyncignore' ~/nextjs/my-auth-todo-app/ vultr_sv:my-auth-todo-app/",
     "start": "next start -p 3001",
     "lint": "next lint"
   },
